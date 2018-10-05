@@ -1,0 +1,38 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.nascentdigital'
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                groupId 'com.nascentdigital'
+                artifactId 'nascentkit'
+
+                name 'NascentKit'
+                description 'An Android framework that simplifies the creation of beautiful apps.'
+                url 'https://github.com/nascentdigital/nascentkit-android.git'
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://github.com/nascentdigital/nascentkit-android/blob/master/LICENSE.md'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'sdedios'
+                        name 'Simeon de Dios'
+                        email 'simeon.dedios@gmail.com'
+                    }
+                }
+                scm {
+                    connection 'https://github.com/nascentdigital/nascentkit-android.git'
+                    developerConnection 'https://github.com/nascentdigital/nascentkit-android.git'
+                    url 'https://github.com/nascentdigital/nascentkit-android'
+                }
+            }
+        }
+    }
+}

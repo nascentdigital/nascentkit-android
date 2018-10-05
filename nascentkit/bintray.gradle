@@ -1,0 +1,34 @@
+apply plugin: 'com.jfrog.bintray'
+
+version = '0.1.0'
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+// Bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = 'Maven'
+        userOrg = 'nascent'
+        name = 'nascentkit'
+        desc = 'An Android framework that simplifies the creation of beautiful apps.'
+        websiteUrl = 'https://github.com/nascentdigital/nascentkit-android'
+        vcsUrl = 'https://github.com/nascentdigital/nascentkit-android.git'
+        licenses = ["MIT"]
+        publish = true
+        publicDownloadNumbers = true
+    }
+}
