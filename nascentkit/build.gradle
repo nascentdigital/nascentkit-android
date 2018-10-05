@@ -1,4 +1,38 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+repositories {
+    mavenCentral()
+}
+
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: "com.github.dcendents.android-maven"
+
+ext {
+    bintrayOrg = 'nascent'
+    bintrayRepo = 'Maven'
+    bintrayName = 'NascentKit'
+
+    publishedGroupId = 'com.nascentdigital'
+    artifact = 'nascentkit'
+    libraryVersion = '0.1.0'
+
+    libraryName = 'NascentKit'
+    libraryDescription = 'An Android framework that simplifies the creation of beautiful apps.'
+
+    siteUrl = 'https://github.com/nascentdigital/nascentkit-android'
+    gitUrl = 'https://github.com/nascentdigital/nascentkit-android.git'
+    developerId = 'sdedios'
+    developerName = 'Simeon de Dios'
+    developerEmail = 'simeon.dedios@gmail.comm'
+
+    licenseName = 'MIT License'
+    licenseUrl = 'https://github.com/nascentdigital/nascentkit-android/blob/master/LICENSE.md'
+    allLicenses = ["MIT"]
+}
 
 android {
     compileSdkVersion 28
@@ -14,7 +48,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -24,6 +57,9 @@ android {
         }
     }
 }
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -1,36 +1,39 @@
 apply plugin: 'com.github.dcendents.android-maven'
 
-group = 'com.nascentdigital'
+group = publishedGroupId
 
 install {
     repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
         pom {
             project {
                 packaging 'aar'
-                groupId 'com.nascentdigital'
-                artifactId 'nascentkit'
+                groupId publishedGroupId
+                artifactId artifact
 
-                name 'NascentKit'
-                description 'An Android framework that simplifies the creation of beautiful apps.'
-                url 'https://github.com/nascentdigital/nascentkit-android.git'
+                // Add your description here
+                name libraryName
+                description libraryDescription
+                url siteUrl
 
+                // Set your license
                 licenses {
                     license {
-                        name 'MIT License'
-                        url 'https://github.com/nascentdigital/nascentkit-android/blob/master/LICENSE.md'
+                        name licenseName
+                        url licenseUrl
                     }
                 }
                 developers {
                     developer {
-                        id 'sdedios'
-                        name 'Simeon de Dios'
-                        email 'simeon.dedios@gmail.com'
+                        id developerId
+                        name developerName
+                        email developerEmail
                     }
                 }
                 scm {
-                    connection 'https://github.com/nascentdigital/nascentkit-android.git'
-                    developerConnection 'https://github.com/nascentdigital/nascentkit-android.git'
-                    url 'https://github.com/nascentdigital/nascentkit-android'
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
                 }
             }
         }
