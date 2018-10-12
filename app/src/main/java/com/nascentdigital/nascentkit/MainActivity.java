@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.nascentdigital.device.CameraPosition;
 import com.nascentdigital.device.CameraView;
 import com.nascentdigital.services.PermissionState;
 import com.nascentdigital.services.Permissions;
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         // start camera
         else {
             Log.d(TAG, "starting CameraView");
-            _camera.start();
+            _camera.start(CameraPosition.BACK);
         }
     }
 

@@ -23,6 +23,7 @@ public class CameraView extends FrameLayout {
 
     private final AspectTextureView _cameraPreview;
     private final CompositeDisposable _cameraPreviewSubscriptions;
+    private CameraPosition _cameraPosition;
     private CameraFeed _cameraFeed;
     private Disposable _cameraFeedSubscription;
     private boolean _active;
@@ -71,7 +72,7 @@ public class CameraView extends FrameLayout {
         }
     }
 
-    public void start() {
+    public void start(CameraPosition cameraPosition) {
 
         // skip if there's an active feed already
         if (_cameraFeed != null) {
@@ -84,35 +85,17 @@ public class CameraView extends FrameLayout {
         // mark active
         _active = true;
 
+        // capture camera position
+        _cameraPosition = cameraPosition;
+
         // skip if the preview is ready
         if (!_cameraPreview.isAvailable()) {
             Log.d(TAG, "deferring start() when preview isn't active");
             return;
         }
 
-        // create feed
-        _cameraFeed = new CameraFeed(getContext());
-
-        Log.d(TAG, "subscribing to CameraFeed events");
-
-        // monitor camera feed changes (ensure callbacks occur on UI thread)
-        _cameraFeedSubscription = _cameraFeed.observeState()
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribe(this::onCameraFeedChanged);
-
-        Log.d(TAG, "starting CameraFeed");
-        try {
-            _cameraFeed.start(CameraPosition.BACK, _cameraPreview);
-        }
-        catch (DeviceAccessException e) {
-            e.printStackTrace();
-        }
-        catch (DeviceDiscoveryException e) {
-            e.printStackTrace();
-        }
-        catch (DeviceNotFoundException e) {
-            e.printStackTrace();
-        }
+        // bind to camera feed
+        bindToFeed();
     }
 
     public void stop() {
@@ -184,6 +167,33 @@ public class CameraView extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
+    private void bindToFeed() {
+
+        Log.d(TAG, "subscribing to CameraFeed events");
+
+        // create feed
+        _cameraFeed = new CameraFeed(getContext());
+
+        // monitor camera feed changes (ensure callbacks occur on UI thread)
+        _cameraFeedSubscription = _cameraFeed.observeState()
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::onCameraFeedChanged);
+
+        Log.d(TAG, "starting CameraFeed");
+        try {
+            _cameraFeed.start(_cameraPosition, _cameraPreview);
+        }
+        catch (DeviceAccessException e) {
+            e.printStackTrace();
+        }
+        catch (DeviceDiscoveryException e) {
+            e.printStackTrace();
+        }
+        catch (DeviceNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void onCameraPreviewAvailableChanged(Boolean available) {
 
         Log.d(TAG, "camera preview available: " + available);
@@ -195,7 +205,7 @@ public class CameraView extends FrameLayout {
 
         // start if available
         if (available) {
-            start();
+            bindToFeed();
         }
 
         // or handle case where camera preview is disposed, but feed is active
