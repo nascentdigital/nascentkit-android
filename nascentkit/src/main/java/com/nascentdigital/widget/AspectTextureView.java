@@ -84,6 +84,11 @@ public class AspectTextureView extends TextureView
     }
 
     @Override
+    public void requestLayout() {
+        super.requestLayout();
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         // call base implementation
