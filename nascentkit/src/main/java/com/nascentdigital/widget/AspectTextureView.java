@@ -84,6 +84,7 @@ public class AspectTextureView extends TextureView
         _aspectHeight = height;
 
         // force layout
+        invalidate();
         requestLayout();
     }
 
@@ -117,17 +118,19 @@ public class AspectTextureView extends TextureView
         // fit to width (scale to aspect-fit)
         else if (width < height * _aspectWidth / _aspectHeight) {
 
-            Log.v(TAG, "fitting width");
+            final int adjustedHeight = width * _aspectHeight / _aspectWidth;
+            setMeasuredDimension(width, adjustedHeight);
 
-            setMeasuredDimension(width, width * _aspectHeight / _aspectWidth);
+            Log.v(TAG, "fitting width -> ("  + width + ", " + adjustedHeight + ")");
         }
 
         // or fit to height (scale to aspect-fit)
         else {
 
-            Log.v(TAG, "fitting height");
+            final int adjustedWidth = height * _aspectWidth / _aspectHeight;
+            setMeasuredDimension(adjustedWidth, height);
 
-            setMeasuredDimension(height * _aspectWidth / _aspectHeight, height);
+            Log.v(TAG, "fitting height -> ("  + adjustedWidth + ", " + height + ")");
         }
     }
 
