@@ -18,7 +18,7 @@ ext {
 
     publishedGroupId = 'com.nascentdigital'
     artifact = 'nascentkit'
-    libraryVersion = '0.2.0'
+    libraryVersion = '0.3.0'
 
     libraryName = 'NascentKit'
     libraryDescription = 'An Android framework that simplifies the creation of beautiful apps.'

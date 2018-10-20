@@ -11,13 +11,23 @@ import android.widget.FrameLayout;
 
 import com.nascentdigital.widget.AspectTextureView;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
 
 
 public class CameraView extends FrameLayout {
+
+    public enum State {
+        STARTING,
+        STARTED,
+        STOPPING,
+        STOPPED,
+        ERROR
+    }
 
     private static final String TAG = "nascent/CameraView";
 
@@ -26,7 +36,10 @@ public class CameraView extends FrameLayout {
     private CameraPosition _cameraPosition;
     private CameraFeed _cameraFeed;
     private Disposable _cameraFeedSubscription;
-    private boolean _active;
+
+    private final Object _stateLock;
+    private final BehaviorSubject<State> _state$;
+    private State _state;
 
 
     public CameraView(@NonNull Context context) {
@@ -47,12 +60,40 @@ public class CameraView extends FrameLayout {
         // initialize instance variables
         _cameraPreview = new AspectTextureView(context);
         _cameraPreviewSubscriptions = new CompositeDisposable();
+        _stateLock = new Object();
+        _state$ = BehaviorSubject.createDefault(_state = State.STOPPED);
 
         // initialize subviews
         _cameraPreview
             .setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT));
         addView(_cameraPreview);
+    }
+
+    public State getState() {
+        synchronized (_stateLock) {
+            return _state;
+        }
+    }
+
+    private void setState(State state) {
+        synchronized (_stateLock) {
+            _state = state;
+            _state$.onNext(state);
+        }
+    }
+
+    private void setState(Exception error) {
+        synchronized (_stateLock) {
+            _state = State.ERROR;
+            _state$.onError(error);
+        }
+    }
+
+    public Observable<State> observeState() {
+        synchronized (_stateLock) {
+            return _state$.distinctUntilChanged();
+        }
     }
 
     public Bitmap getPreviewBitmap() {
@@ -82,8 +123,8 @@ public class CameraView extends FrameLayout {
 
         Log.d(TAG, "starting CameraView");
 
-        // mark active
-        _active = true;
+        // update state
+        setState(State.STARTING);
 
         // capture camera position
         _cameraPosition = cameraPosition;
@@ -105,8 +146,8 @@ public class CameraView extends FrameLayout {
 
             Log.d(TAG, "ignoring stop() - not active");
 
-            // ensure active flag is cleared
-            _active = false;
+            // update state
+            setState(State.STOPPED);
 
             // stop processing
             return;
@@ -114,8 +155,8 @@ public class CameraView extends FrameLayout {
 
         Log.d(TAG, "stopping CameraView");
 
-        // mark as inactive
-        _active = false;
+        // update state
+        setState(State.STOPPING);
 
         Log.d(TAG, "unsubscribing from CameraFeed events");
 
@@ -125,12 +166,25 @@ public class CameraView extends FrameLayout {
 
         Log.d(TAG, "stopping CameraFeed");
 
+        // stop camera feed
         try {
+
+            // stop feed
             _cameraFeed.stop();
             _cameraFeed = null;
+
+            // update state
+            setState(State.STOPPED);
         }
+
+        // handler error
         catch (DeviceAccessException e) {
+
+            // print stack trace
             e.printStackTrace();
+
+            // update state
+            setState(e);
         }
     }
 
@@ -179,18 +233,21 @@ public class CameraView extends FrameLayout {
             .subscribeOn(AndroidSchedulers.mainThread())
             .subscribe(this::onCameraFeedChanged);
 
-        Log.d(TAG, "starting CameraFeed");
+        // start feed
         try {
+
+            Log.d(TAG, "starting CameraFeed");
             _cameraFeed.start(_cameraPosition, _cameraPreview);
         }
-        catch (DeviceAccessException e) {
+
+        // handle error
+        catch (Exception e) {
+
+            // print stack
             e.printStackTrace();
-        }
-        catch (DeviceDiscoveryException e) {
-            e.printStackTrace();
-        }
-        catch (DeviceNotFoundException e) {
-            e.printStackTrace();
+
+            // update state
+            setState(e);
         }
     }
 
@@ -199,7 +256,7 @@ public class CameraView extends FrameLayout {
         Log.d(TAG, "camera preview available: " + available);
 
         // ignore if not active
-        if (!_active) {
+        if (getState() != State.STARTING) {
             return;
         }
 
@@ -229,8 +286,10 @@ public class CameraView extends FrameLayout {
         // handle changes to camera feed state
         switch (state) {
 
+            // update state when connected
             case CONNECTED:
                 Log.d(TAG, "CameraFeed connected");
+                setState(State.STARTED);
                 break;
 
             default:

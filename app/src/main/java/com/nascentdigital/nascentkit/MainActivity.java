@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private CameraView _camera;
     private ImageView _preview;
     private Disposable _cameraPreviewSubscription;
+    private Disposable _cameraStateSubscription;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         _camera = findViewById(R.id.camera);
         _preview = findViewById(R.id.preview);
+
+        // track camera states
+        _cameraStateSubscription = _camera.observeState()
+            .subscribe(state -> Log.d(TAG, "updated state" + state));
 
         // bind button event
         findViewById(R.id.take_photo)
@@ -100,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
 
         // finalize capture
         stopCamera();
+
+        // remove subscription
+        _cameraStateSubscription.dispose();;
     }
 
     private void startCamera() {
