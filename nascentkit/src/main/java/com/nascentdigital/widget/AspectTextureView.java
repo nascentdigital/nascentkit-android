@@ -84,26 +84,30 @@ public class AspectTextureView extends TextureView
         final int width = MeasureSpec.getSize(widthMeasureSpec);
         final int height = MeasureSpec.getSize(heightMeasureSpec);
 
-        Log.v(TAG, "updating measure for (" + width + ", " + height + ")");
+        Log.v(TAG, "updating measure for (" + width + ", " + height
+            + ") and aspect " + _aspectWidth + ":" + _aspectHeight);
 
         // use width / height directly if either aspect size is unspecified
         if (_aspectWidth == 0 || _aspectHeight == 0) {
 
+            Log.v(TAG, "using full width / height");
 
-            // use full width / height (scale to fill)
             setMeasuredDimension(width, height);
-
-            // stop processing
-            return;
         }
 
         // fit to width (scale to aspect-fit)
-        if (width < height * _aspectWidth / _aspectHeight) {
+        else if (width < height * _aspectWidth / _aspectHeight) {
+
+            Log.v(TAG, "fitting width");
+
             setMeasuredDimension(width, width * _aspectHeight / _aspectWidth);
         }
 
         // or fit to height (scale to aspect-fit)
         else {
+
+            Log.v(TAG, "fitting height");
+
             setMeasuredDimension(height * _aspectWidth / _aspectHeight, height);
         }
     }

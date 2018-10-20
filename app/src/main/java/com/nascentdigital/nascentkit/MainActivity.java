@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         // track camera states
         _cameraStateSubscription = _camera.observeState()
-            .subscribe(state -> Log.d(TAG, "updated state" + state));
+            .subscribe(state -> Log.d(TAG, "updated state: " + state));
 
         // bind button event
         findViewById(R.id.take_photo)
