@@ -2,12 +2,15 @@ package com.nascentdigital.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.view.TextureView;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 
@@ -70,8 +73,14 @@ public class AspectTextureView extends TextureView
         _aspectWidth = width;
         _aspectHeight = height;
 
-        // force layout
-        requestLayout();
+        // request layout
+        new Handler(Looper.getMainLooper()).post(() -> {
+
+            Log.v(TAG, "requesting layout");
+
+            // force layout
+            requestLayout();
+        });
     }
 
     @Override

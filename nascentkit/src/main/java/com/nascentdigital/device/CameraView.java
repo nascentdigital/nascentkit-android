@@ -273,7 +273,7 @@ public class CameraView extends FrameLayout {
 
     private void onCameraPreviewSizeChanged(Size size) {
 
-        Log.d(TAG, "camera size changed: " + size);
+        Log.d(TAG, "camera preview size changed: " + size);
 
         // update preview transform if feed is active
         if (_cameraFeed != null) {

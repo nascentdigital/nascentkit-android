@@ -382,6 +382,10 @@ public class CameraFeed {
         final float centerX = previewRect.centerX();
         final float centerY = previewRect.centerY();
 
+        Log.v(TAG, "updating preview transform ("
+            + imageWidth + ", " + imageHeight + ") -> ("
+            + previewWidth + ", " + previewHeight + ")");
+
         // setup rotate and fit if rotated perpendicularly
         final Matrix matrix = new Matrix();
         final int rotation = _display.getRotation();
@@ -402,11 +406,15 @@ public class CameraFeed {
 
             // apply rotation
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+
+            Log.v(TAG, "rotating 90 degress and scaling by " + scale);
         }
 
         // or just apply rotation if upside down
         else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
+
+            Log.v(TAG, "rotating 180 degress");
         }
 
         // update preview transformation using matrix
@@ -416,7 +424,7 @@ public class CameraFeed {
     private void resolveCamera(CameraPosition cameraPosition)
         throws CameraAccessException, DeviceNotFoundException {
 
-        Log.v(TAG, "Searching for " + cameraPosition + " camera.");
+        Log.v(TAG, "searching for " + cameraPosition + " camera.");
 
         // search for camera using the registered devices
         String cameraId = null;
