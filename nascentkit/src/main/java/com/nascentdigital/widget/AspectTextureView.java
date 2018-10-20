@@ -25,6 +25,16 @@ public class AspectTextureView extends TextureView
     private int _aspectWidth = 0;
     private int _aspectHeight = 0;
 
+    private final Runnable measureAndLayout = new Runnable() {
+        @Override
+        public void run() {
+            measure(
+                MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
+            layout(getLeft(), getTop(), getRight(), getBottom());
+        }
+    };
+
 
     public AspectTextureView(Context context) {
         this(context, null);
@@ -73,19 +83,14 @@ public class AspectTextureView extends TextureView
         _aspectWidth = width;
         _aspectHeight = height;
 
-        // request layout
-        new Handler(Looper.getMainLooper()).post(() -> {
-
-            Log.v(TAG, "requesting layout");
-
-            // force layout
-            requestLayout();
-        });
+        // force layout
+        requestLayout();
     }
 
     @Override
     public void requestLayout() {
         super.requestLayout();
+        post(measureAndLayout);
     }
 
     @Override
