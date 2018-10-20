@@ -63,7 +63,10 @@ public class CameraView extends FrameLayout {
         _stateLock = new Object();
         _state$ = BehaviorSubject.createDefault(_state = State.STOPPED);
 
-        // add preview as subview
+        // initialize subviews
+        _cameraPreview
+            .setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT));
         addView(_cameraPreview);
     }
 

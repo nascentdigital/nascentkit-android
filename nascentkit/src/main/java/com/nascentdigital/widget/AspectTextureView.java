@@ -2,15 +2,12 @@ package com.nascentdigital.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.view.TextureView;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 
@@ -24,16 +21,6 @@ public class AspectTextureView extends TextureView
 
     private int _aspectWidth = 0;
     private int _aspectHeight = 0;
-
-    private final Runnable measureAndLayout = new Runnable() {
-        @Override
-        public void run() {
-            measure(
-                MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
-            layout(getLeft(), getTop(), getRight(), getBottom());
-        }
-    };
 
 
     public AspectTextureView(Context context) {
@@ -84,14 +71,7 @@ public class AspectTextureView extends TextureView
         _aspectHeight = height;
 
         // force layout
-        invalidate();
         requestLayout();
-    }
-
-    @Override
-    public void requestLayout() {
-        super.requestLayout();
-        post(measureAndLayout);
     }
 
     @Override
@@ -103,9 +83,6 @@ public class AspectTextureView extends TextureView
         // resolve actual width / height
         final int width = MeasureSpec.getSize(widthMeasureSpec);
         final int height = MeasureSpec.getSize(heightMeasureSpec);
-
-        Log.v(TAG, "updating measure for (" + width + ", " + height
-            + ") and aspect " + _aspectWidth + ":" + _aspectHeight);
 
         // use width / height directly if either aspect size is unspecified
         if (_aspectWidth == 0 || _aspectHeight == 0) {
